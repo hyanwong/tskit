@@ -1462,6 +1462,11 @@ class Tree:
         style=None,
         order=None,
         force_root_branch=None,
+        symbol_size=None,
+        x_label=None,
+        y_label=None,
+        y_ticks=None,
+        y_gridlines=None,
         **kwargs,
     ):
         """
@@ -1608,6 +1613,21 @@ class Tree:
         :param bool force_root_branch: If ``True`` always plot a branch (edge) above the
             root(s) in the tree. If ``None`` (default) then only plot such root branches
             if there is a mutation above a root of the tree.
+        :param float symbol_size: Change the default size of the node and mutation
+            plotting symbols. If ``None`` (default) use a standard, sensible size.
+        :param str x_label: If given, add a labelled X axis to the plot, showing the
+            start and end position of this tree along the genome. ``None`` (default)
+            hides the X axis
+        :param str y_label: If given, add a labelled Y axis to the plot, showing the
+            time (or rank, if ``tree_height_scale`` is ``"rank"``) of nodes and
+            mutations in the tree. ``None`` (default) hides the Y axis.
+            hides the X axis
+        :param list y_ticks: A list of y values at which to plot tickmarks (or
+            ``False`` for no tickmarks). If ``None``, plot one tickmark for each unique
+            node value.
+        :param bool y_gridlines: Whether to plot horizontal lines behind the tree
+            at each y tickmark. If ``None`` (default), only plot gridlines if a list
+            of ``y_ticks`` has also been given.
 
         :return: An SVG representation of a tree.
         :rtype: str
@@ -1623,6 +1643,11 @@ class Tree:
             style=style,
             order=order,
             force_root_branch=force_root_branch,
+            symbol_size=symbol_size,
+            x_label=x_label,
+            y_label=y_label,
+            y_ticks=y_ticks,
+            y_gridlines=y_gridlines,
             **kwargs,
         )
         output = draw.drawing.tostring()
@@ -5276,7 +5301,11 @@ class TreeSequence:
         style=None,
         order=None,
         force_root_branch=None,
+        symbol_size=None,
         x_label=None,
+        y_label=None,
+        y_ticks=None,
+        y_gridlines=None,
         **kwargs,
     ):
         """
@@ -5341,8 +5370,20 @@ class TreeSequence:
         :param bool force_root_branch: If ``True`` plot a branch (edge) above every tree
             root in the tree sequence. If ``None`` (default) then only plot such
             root branches if any root in the tree sequence has a mutation above it.
+        :param float symbol_size: Change the default size of the node and mutation
+            plotting symbols. If ``None`` (default) use a standard, sensible size.
         :param str x_label: A string to display on the X axis, e.g. "Genomic position".
             If ``None`` (default) do not label the X axis in this tree sequence.
+        :param str y_label: If given, add a labelled Y axis to the plot, showing the
+            time (or rank, if ``tree_height_scale`` is ``"rank"``) of nodes and
+            mutations in the tree. ``None`` (default) hides the Y axis.
+            hides the X axis
+        :param list y_ticks: A list of y values at which to plot tickmarks (or
+            ``False`` for no tickmarks). If ``None``, plot one tickmark for each unique
+            node value.
+        :param bool y_gridlines: Whether to plot horizontal lines behind the tree
+            at each y tickmark. If ``None`` (default), only plot gridlines if a list
+            of ``y_ticks`` has also been given.
 
         :return: An SVG representation of a tree sequence.
         :rtype: str
@@ -5358,7 +5399,11 @@ class TreeSequence:
             style=style,
             order=order,
             force_root_branch=force_root_branch,
+            symbol_size=symbol_size,
             x_label=x_label,
+            y_label=y_label,
+            y_ticks=y_ticks,
+            y_gridlines=y_gridlines,
             **kwargs,
         )
         output = draw.drawing.tostring()

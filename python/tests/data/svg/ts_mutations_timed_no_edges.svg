@@ -78,8 +78,8 @@
 					</g>
 					<g class="leaf m0 node n5 p0 root s0 sample" transform="translate(86 138.2)">
 						<path class="edge" d="M 0 0 V -16.025 H 0"/>
-						<g class="mut m0 s0" transform="translate(0 -8.0125)">
-							<line x1="0" x2="0" y1="0" y2="8.0125"/>
+						<g class="mut m0 s0" transform="translate(0 0.0)">
+							<line x1="0" x2="0" y1="0" y2="-0.0"/>
 							<path class="sym" d="M -3,-3 l 6,6 M -3,3 l 6,-6"/>
 							<text class="lab rgt" transform="translate(5 0)">0</text>
 						</g>
@@ -92,9 +92,9 @@
 						<text class="lab" transform="translate(0 11)">6</text>
 					</g>
 					<g class="leaf m3 node n7 p0 root s3 sample" transform="translate(110 138.2)">
-						<path class="edge" d="M 0 0 V -16.025 H 0"/>
-						<g class="mut m3 s3" transform="translate(0 -8.0125)">
-							<line x1="0" x2="0" y1="0" y2="8.0125"/>
+						<path class="edge" d="M 0 0 V -128.2 H 0"/>
+						<g class="mut m3 s3" transform="translate(0 -128.2)">
+							<line x1="0" x2="0" y1="0" y2="128.2"/>
 							<path class="sym" d="M -3,-3 l 6,6 M -3,3 l 6,-6"/>
 							<text class="lab rgt" transform="translate(5 0)">3</text>
 						</g>
