@@ -7291,8 +7291,7 @@ class TreeSequence:
             ``None``. If ``None``, only sample nodes are mapped to each other.
             Default: ``None``, treated as ``[None] * len(args)``.
         :param bool record_provenance: If True (default), record details of this
-            call to ``concatenate`` in the returned tree sequence's provenance
-            information (Default: True).
+            call to ``concatenate`` in the returned tree sequence's provenance.
         :param bool add_populations: If True (default), nodes new to ``self`` will
             be assigned new population IDs (see :meth:`~TreeSequence.union`)
         """
@@ -7342,7 +7341,15 @@ class TreeSequence:
 
         return tables.tree_sequence()
 
-    def split_edges(self, time, *, flags=None, population=None, metadata=None):
+    def split_edges(
+        self,
+        time,
+        *,
+        flags=None,
+        population=None,
+        metadata=None,
+        record_provenance=True,
+    ):
         """
         Returns a copy of this tree sequence in which we replace any
         edge ``(left, right, parent, child)`` in which
@@ -7377,6 +7384,8 @@ class TreeSequence:
         :param metadata: The metadata for any newly inserted nodes. See
             :meth:`.NodeTable.add_row` for details on how default metadata
             is produced for a given schema (or none).
+        :param bool record_provenance: If True (default), record details of this
+            call to ``split_edges`` in the returned tree sequence's provenance.
         :return: A copy of this tree sequence with edges split at the specified time.
         :rtype: tskit.TreeSequence
         """
@@ -7392,9 +7401,29 @@ class TreeSequence:
             population=population,
             metadata=metadata,
         )
-        return TreeSequence(ll_ts)
+        ts = TreeSequence(ll_ts)
+        if record_provenance:
+            tables = ts.dump_tables()
+            parameters = {
+                "command": "split_edges",
+                "time": time,
+                "TODO": "add other split_edges parameters",
+            }
+            tables.provenances.add_row(
+                record=json.dumps(provenance.get_provenance_dict(parameters))
+            )
+            ts = tables.tree_sequence()
+        return ts
 
-    def decapitate(self, time, *, flags=None, population=None, metadata=None):
+    def decapitate(
+        self,
+        time,
+        *,
+        flags=None,
+        population=None,
+        metadata=None,
+        record_provenance=True,
+    ):
         """
         Delete all edge topology and mutational information at least as old
         as the specified time from this tree sequence.
@@ -7429,18 +7458,32 @@ class TreeSequence:
         :param metadata: The metadata for any newly inserted nodes. See
             :meth:`.NodeTable.add_row` for details on how default metadata
             is produced for a given schema (or none).
+        :param bool record_provenance: If True (default), record details of this
+            call to ``decapitate`` in the returned tree sequence's provenance.
         :return: A copy of this tree sequence with edges split at the specified time.
         :rtype: tskit.TreeSequence
         """
         split_ts = self.split_edges(
-            time, flags=flags, population=population, metadata=metadata
+            time,
+            flags=flags,
+            population=population,
+            metadata=metadata,
+            record_provenance=False,
         )
         tables = split_ts.dump_tables()
         del split_ts
         tables.delete_older(time)
+        if record_provenance:
+            parameters = {
+                "command": "decapitate",
+                "TODO": "add other decapitate parameters",
+            }
+            tables.provenances.add_row(
+                record=json.dumps(provenance.get_provenance_dict(parameters))
+            )
         return tables.tree_sequence()
 
-    def extend_haplotypes(self, max_iter=10):
+    def extend_haplotypes(self, max_iter=10, record_provenance=True):
         """
         Returns a new tree sequence in which the span covered by ancestral nodes
         is "extended" to regions of the genome according to the following rule:
@@ -7486,12 +7529,25 @@ class TreeSequence:
 
         :param int max_iter: The maximum number of iterations over the tree
             sequence. Defaults to 10.
+        :param bool record_provenance: If True (default), record details of this
+            call to ``extend_haplotypes`` in the returned tree sequence's provenance.
         :return: A new tree sequence with unary nodes extended.
         :rtype: tskit.TreeSequence
         """
         max_iter = int(max_iter)
         ll_ts = self._ll_tree_sequence.extend_haplotypes(max_iter)
-        return TreeSequence(ll_ts)
+        ts = TreeSequence(ll_ts)
+        if record_provenance:
+            tables = ts.dump_tables()
+            parameters = {
+                "command": "extend_haplotypes",
+                "max_iter": max_iter,
+            }
+            tables.provenances.add_row(
+                record=json.dumps(provenance.get_provenance_dict(parameters))
+            )
+            ts = tables.tree_sequence()
+        return ts
 
     def subset(
         self,

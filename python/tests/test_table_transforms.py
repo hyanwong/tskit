@@ -25,6 +25,7 @@ Test cases for table transformation operations like trim(), decapitate, etc.
 import decimal
 import fractions
 import io
+import json
 import math
 
 import numpy as np
@@ -644,6 +645,17 @@ class TestSplitEdgesInterface:
         with pytest.raises(tskit.LibraryError, match="TIME_NONFINITE"):
             ts.split_edges(time)
 
+    def test_provenance(self):
+        ts = tskit.TableCollection(1).tree_sequence()
+        split = ts.split_edges(time=0, record_provenance=False)
+        assert split.num_provenances == ts.num_provenances
+        split = ts.split_edges(time=0, record_provenance=True)
+        assert split.num_provenances == ts.num_provenances + 1
+        assert (
+            json.loads(split.provenance(-1).record)["parameters"]["command"]
+            == "split_edges"
+        )
+
 
 class TestSplitEdgesNodeValues:
     @tests.cached_example
@@ -1181,7 +1193,9 @@ class TestDecapitateInterface:
     def test_number_types(self, time):
         expected = self.ts().decapitate(1)
         got = self.ts().decapitate(time)
-        expected.tables.assert_equals(got.tables, ignore_timestamps=True)
+        expected.tables.assert_equals(
+            got.tables, ignore_timestamps=True, ignore_provenance=True
+        )
 
     def test_migrations_not_supported(self, ts_fixture):
         with pytest.raises(tskit.LibraryError, match="MIGRATIONS_NOT_SUPPORTED"):
@@ -1216,3 +1230,14 @@ class TestDecapitateInterface:
         ts = tables.tree_sequence()
         with pytest.raises(tskit.LibraryError, match="TIME_NONFINITE"):
             ts.decapitate(time)
+
+    def test_provenance(self):
+        orig = self.ts()
+        ts = orig.decapitate(time=0, record_provenance=False)
+        assert ts.num_provenances == orig.num_provenances
+        ts = orig.decapitate(time=0, record_provenance=True)
+        assert ts.num_provenances == orig.num_provenances + 1
+        assert (
+            json.loads(ts.provenance(-1).record)["parameters"]["command"]
+            == "decapitate"
+        )

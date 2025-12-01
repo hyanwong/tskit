@@ -1,3 +1,5 @@
+import json
+
 import msprime
 import numpy as np
 import pytest
@@ -1104,7 +1106,7 @@ class TestExtendHaplotypes(TestExtendThings):
         self.naive_verify(ts)
 
     @pytest.mark.parametrize("j", [1, 2, 3, 4, 5])
-    def test_redundant_breakpoitns(self, j):
+    def test_redundant_breakpoints(self, j):
         ts, correct_ets = self.get_example(j)
         ts = tsutil.insert_redundant_breakpoints(ts)
         test_ets = ts.extend_haplotypes()
@@ -1145,7 +1147,7 @@ class TestExtendHaplotypes(TestExtendThings):
         ets = ts.extend_haplotypes(max_iter=1)
         et = ets.extend_haplotypes(max_iter=1).dump_tables()
         eet = ets.extend_haplotypes(max_iter=2).dump_tables()
-        eet.assert_equals(et)
+        eet.assert_equals(et, ignore_provenance=True)
 
     def test_very_simple(self):
         samples = [0]
@@ -1242,6 +1244,17 @@ class TestExtendHaplotypes(TestExtendThings):
         self.verify_extend_haplotypes(ts)
         self.naive_verify(ts)
 
+    def test_provenance(self):
+        ts = msprime.simulate(5, mutation_rate=1.0, random_seed=126)
+        ets = ts.extend_haplotypes(record_provenance=False)
+        assert ets.num_provenances == ts.num_provenances
+        ets = ts.extend_haplotypes(record_provenance=True)
+        assert ets.num_provenances == ts.num_provenances + 1
+        assert (
+            json.loads(ets.provenance(-1).record)["parameters"]["command"]
+            == "extend_haplotypes"
+        )
+
 
 class TestExamples(TestExtendThings):
     """
@@ -1256,7 +1269,7 @@ class TestExamples(TestExtendThings):
         py_ets = extend_haplotypes(ts)
         self.verify_simplify_equality(ts, py_ets)
         lib_ts = ts.extend_haplotypes()
-        lib_ts.tables.assert_equals(py_ets.tables)
+        lib_ts.tables.assert_equals(py_ets.tables, ignore_provenance=True)
         assert np.all(ts.genotype_matrix() == lib_ts.genotype_matrix())
         sts = ts.simplify()
         lib_sts = lib_ts.simplify()
